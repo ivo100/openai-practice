@@ -1,0 +1,2 @@
+# openai-practice
+just practice
