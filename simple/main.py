@@ -125,15 +125,16 @@ class Simple:
         
         return uploaded_file.id, vector_store_id
 
-    def search_pdf(self, vector_store_id: str, query: str, model: str = "gpt-4.1", 
-                   instructions: str = "You are a helpful assistant that answers questions based on the provided documents."):
+    def search_pdf(self, query: str, vector_store_id: str = "vs_6911003f426081918806cb07bb8f440c", 
+                   model: str = "gpt-4.1",
+                   instructions: str = "You are financial assistant that answers questions based on the provided documents."):
         """
-        Perform a file search query against a vector store.
+        Perform a file search query against a vector store using the Responses API.
         
         Args:
-            vector_store_id: The ID of the vector store to search
             query: The search query
-            model: The model to use for the search (default: "gpt-4.1")
+            vector_store_id: The ID of the vector store to search
+            model: The model to use for the search (default: "gpt-4-1106-preview")
             instructions: Instructions for the assistant (default: helpful assistant)
         
         Returns:
@@ -141,17 +142,21 @@ class Simple:
         """
         print(f"Searching for: {query}")
         start_time = time.time()
+        
+        # Use the Responses API with file search
         response = self.client.responses.create(
-            model=model,
-            instructions=instructions,
+            model="gpt-4.1",
             input=query,
-            tools=[{"type": "file_search"}],
-            file_search={"vector_store_ids": [vector_store_id]}
+            tools=[{
+                "type": "file_search",
+                "vector_store_ids": [vector_store_id]
+            }]
         )
+        
         elapsed_time = time.time() - start_time
         print(f"Search time: {elapsed_time:.2f} sec")
         
-        return response
+        return response.output_text
 
     def upload_pdf_and_search(self, pdf_path: str, query: str):
         """
@@ -271,17 +276,25 @@ class Simple:
 
 if __name__ == "__main__":
     simple = Simple()
-    #resp = simple.run("tell me a joke") 
+
     # resp1, resp2 = simple.run("What is the capital of France?", "And it's population (proper)?") 
     # print(resp1.output_text)
     # print(resp2.output_text)
+
     # resp = simple.web_search()
     # print(resp.output_text)
     
     # Example: Upload PDF and search (split methods)
     # file_id, vector_store_id = simple.upload_pdf("path/to/your/document.pdf")
-    # resp = simple.search_pdf(vector_store_id, "What is the main topic of this document?")
-    # print(resp.output_text)
+
+    # Example: View PDF
+    #simple.view_pdf("simple/data/the-options-income-blueprint.pdf", show_text=True, max_pages=3)
+    #simple.view_pdf("simple/data/the-options-income-blueprint.pdf", show_text=True, max_pages=3)
+    # simple.view_pdf("simple/data/the-options-income-blueprint.pdf", open_in_viewer=True)
+
+    resp = simple.search_pdf("What is bullish call spread?")
+    #print(resp.output_text)
+    print(resp)
     
     # Example: Upload PDF and search (convenience method)
     # resp, vector_store_id = simple.upload_pdf_and_search(
@@ -290,6 +303,3 @@ if __name__ == "__main__":
     # )
     # print(resp.output_text)
     
-    # Example: View PDF
-    # simple.view_pdf("simple/data/the-options-income-blueprint.pdf", show_text=True, max_pages=3)
-    # simple.view_pdf("simple/data/the-options-income-blueprint.pdf", open_in_viewer=True)
