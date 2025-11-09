@@ -1,37 +1,57 @@
+
+https://platform.openai.com/docs/pricing
+
+MODEL	        INPUT	CACHED INPUT	OUTPUT
+
+gpt-5	        $1.25	$0.125	$10.00
+gpt-5-mini	    $0.25	$0.025	$2.00
+gpt-5-nano	    $0.05	$0.005	$0.40
+gpt-5-chat-latest $1.25	$0.125	$10.00
+gpt-5-codex	$1.25 $0.125	$10.00
+gpt-5-pro	    $15.00	-	$120.00
+
+gpt-4.1	$2.00	$0.50	$8.00
+gpt-4.1-mini	$0.40	$0.10	$1.60
+gpt-4.1-nano	$0.10	$0.025	$0.40
+
+gpt-4o	        $2.50	$1.25	$10.00
+gpt-4o-2024-05-13 $5.00	-	$15.00
+gpt-4o-mini	    $0.15	$0.075	
+
 https://platform.openai.com/docs/guides/migrate-to-responses?update-item-definitions=responses&update-multiturn=responses
 
-context = [
-    { "role": "role", "content": "What is the capital of France?" }
-]
-res1 = client.responses.create(
-    model="gpt-5",
-    input=context,
-)
+Using model: gpt-5-nano
 
-// Append the first response’s output to context
-context += res1.output
+First response time: 2.50 sec
+Second response time: 13.39 sec
+Paris.
+Paris proper (the city within the 20 arrondissements) has about 2.1 million residents—roughly 2.14 million according to recent INSEE figures (2019–2020). The larger Paris metropolitan area is much bigger, around 12 million. If you want the exact latest year, tell me which year you want.
 
-// Add the next user message
-context += [
-    { "role": "role", "content": "And it's population?" }
-]
-
-res2 = client.responses.create(
-    model="gpt-5",
-    input=context,
-)
+Using model: gpt-5-mini
+First response time: 1.72 sec
+Second response time: 7.60 sec
 
 
+"""
+Response(id='resp_0804ca6536c1056400690fa6d171c48193b8cecb21edda4a3d', created_at=1762633425.0, error=None, 
+incomplete_details=None, instructions=None, metadata={}, model='gpt-4o-mini-2024-07-18', 
+object='response',
+ 
+output=[ResponseOutputMessage(id='msg_0804ca6536c1056400690fa6d2537c8193964c5a7b4a2178b5', 
+content=[ResponseOutputText(annotations=[], 
+text='Why did the scarecrow win an award?\n\nBecause he was outstanding in his field!', 
+type='output_text', logprobs=[])], 
+role='assistant', status='completed', 
+type='message')],
+ 
+parallel_tool_calls=True, temperature=1.0, tool_choice='auto', tools=[], top_p=1.0, background=False, conversation=None, max_output_tokens=None, max_tool_calls=None, 
+previous_response_id=None, prompt=None, prompt_cache_key=None, reasoning=Reasoning(effort=None, generate_summary=None, summary=None), 
+safety_identifier=None, service_tier='default', status='completed', text=ResponseTextConfig(format=ResponseFormatText(type='text'), verbosity='medium'), 
+top_logprobs=0, truncation='disabled', 
 
-res1 = client.responses.create(
-    model="gpt-5",
-    input="What is the capital of France?",
-    store=True
-)
+usage=ResponseUsage(input_tokens=11, input_tokens_details=InputTokensDetails(cached_tokens=0), 
+output_tokens=18, output_tokens_details=OutputTokensDetails(reasoning_tokens=0), total_tokens=29), 
+user=None, billing={'payer': 'openai'}, 
+prompt_cache_retention=None, store=True)
 
-res2 = client.responses.create(
-    model="gpt-5",
-    input="And its population?",
-    previous_response_id=res1.id,
-    store=True
-)
+"""
