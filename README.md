@@ -23,8 +23,14 @@ Execute the simple script with:
 poetry run simple
 ```
 
-You can also run the module directly:
+or
+ave (source venv/bin/activate)
+
+python simple/main.py
+
+You can also run the module directly (in venv):
 
 ```bash
 python -m simple.main
 ```
+

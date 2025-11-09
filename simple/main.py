@@ -274,10 +274,10 @@ class Simple:
         
         return result
 
+
 if __name__ == "__main__":
     simple = Simple()
-
-    # resp1, resp2 = simple.run("What is the capital of France?", "And it's population (proper)?") 
+    # resp1, resp2 = simple.run("What is the capital of France?", "And it's population (proper)?")
     # print(resp1.output_text)
     # print(resp2.output_text)
 
