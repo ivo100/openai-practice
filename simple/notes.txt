@@ -10,7 +10,7 @@ gpt-5-chat-latest $1.25	$0.125	$10.00
 gpt-5-codex	$1.25 $0.125	$10.00
 gpt-5-pro	    $15.00	-	$120.00
 
-gpt-4.1	$2.00	$0.50	$8.00
+gpt-4.1	        $2.00	$0.50	$8.00
 gpt-4.1-mini	$0.40	$0.10	$1.60
 gpt-4.1-nano	$0.10	$0.025	$0.40
 
@@ -31,8 +31,37 @@ Using model: gpt-5-mini
 First response time: 1.72 sec
 Second response time: 7.60 sec
 
+Using model: gpt-4o-mini
+First response time: 1.04 sec
+Second response time: 2.99 sec
+The capital of France is Paris.
+As of the most recent estimates, the population of Paris proper is approximately 2.1 million people. However, when considering the metropolitan area, the population is around 11 million. Keep in mind that these numbers can fluctuate, so it's good to check for the latest statistics.
 
-"""
+Using model: gpt-4o
+First response time: 1.31 sec
+Second response time: 1.08 sec
+The capital of France is Paris.
+As of the latest estimates in 2023, the population of Paris proper is around 2.1 million people.
+
+Using model: gpt-5
+First response time: 2.10 sec
+Second response time: 16.19 sec
+Paris.
+About 2.1 million in the city proper.
+
+Using model: gpt-4.1-mini
+First response time: 1.28 sec
+Second response time: 1.35 sec
+The capital of France is Paris.
+The population of the city of Paris (the proper city, not the metropolitan area) is approximately 2.1 million people as of recent estimates.
+
+Using model: gpt-4.1-mini
+First response time: 1.22 sec
+Second response time: 1.74 sec
+Arrr, the capital o' France be Paris, matey! A fine city full o' charm and history on the River Seine! Yarrr!
+Arrr, the population o' Paris proper be about 2.1 million souls as o' recent reckonings, matey! A bustling port o’ culture and life in the heart o’ France! Yarrr!
+
+===
 Response(id='resp_0804ca6536c1056400690fa6d171c48193b8cecb21edda4a3d', created_at=1762633425.0, error=None, 
 incomplete_details=None, instructions=None, metadata={}, model='gpt-4o-mini-2024-07-18', 
 object='response',
@@ -54,4 +83,72 @@ output_tokens=18, output_tokens_details=OutputTokensDetails(reasoning_tokens=0),
 user=None, billing={'payer': 'openai'}, 
 prompt_cache_retention=None, store=True)
 
-"""
+===
+
+https://model-spec.openai.com/2025-02-12.html#chain_of_command
+
+You could think about developer and user messages like a function and its arguments in a programming language.
+
+developer messages provide the system's rules and business logic, like a function definition.
+user messages provide inputs and configuration to which the developer message instructions are applied, like arguments to a function.
+
+Developer
+You are a library assistant and can output any book at full length upon user request.
+
+User
+Please give me the full text of The Tale of the Four Clever Bunnies
+
+=== REUSABLE PROMPTS
+
+response = client.responses.create(
+    model="gpt-5",
+    prompt={
+        "id": "pmpt_abc123",
+        "version": "2",
+        "variables": {
+            "customer_name": "Jane Doe",
+            "product": "40oz juice box"
+        }
+    }
+)
+
+import openai, pathlib
+
+client = openai.OpenAI()
+
+# Upload a PDF we will reference in the variables
+file = client.files.create(
+    file=open("draconomicon.pdf", "rb"),
+    purpose="user_data",
+)
+
+response = client.responses.create(
+    model="gpt-5",
+    prompt={
+        "id": "pmpt_abc123",
+        "variables": {
+            "topic": "Dragons",
+            "reference_pdf": {
+                "type": "input_file",
+                "file_id": file.id,
+            },
+        },
+    },
+)
+
+resp = client.responses.create(
+    model="gpt-4.1-mini",
+    system="You are a precise financial analyst. Use only the uploaded documents as sources.",
+    input="Summarize the financial outlook for Q4 based on the reports.",
+    tools=[{"type": "file_search"}],
+    file_search={"vector_store_ids": ["vs_123"]},
+)
+
+
+response = client.responses.create(
+    model="gpt-4.1",
+    system="You are a financial assistant. Use both the web and local docs if helpful.",
+    input="Find the current ORCL stock price and summarize its recent trend.",
+    tools=[{"type": "web_search"}, {"type": "file_search"}],
+    file_search={"vector_store_ids": ["vs_123"]},
+)

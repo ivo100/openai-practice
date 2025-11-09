@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 import os
 import time
 from pathlib import Path
+import platform
+import subprocess
+from pypdf import PdfReader
 
 
 class Simple:
@@ -165,6 +168,107 @@ class Simple:
         response = self.search_pdf(vector_store_id, query)
         return response, vector_store_id
 
+    def view_pdf(self, pdf_path: str, show_text: bool = False, max_pages: int = None, 
+                 open_in_viewer: bool = False):
+        """
+        View PDF file information and optionally extract text or open in system viewer.
+        
+        Args:
+            pdf_path: Path to the PDF file
+            show_text: If True, extract and display text from pages
+            max_pages: Maximum number of pages to extract text from (None for all pages)
+            open_in_viewer: If True, open PDF in system default viewer
+        
+        Returns:
+            Dictionary with PDF metadata and optionally text content
+        """
+        pdf_file = Path(pdf_path)
+        if not pdf_file.exists():
+            raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+        
+        print(f"\n{'='*60}")
+        print(f"PDF Viewer: {pdf_file.name}")
+        print(f"{'='*60}")
+        
+        # Read PDF
+        reader = PdfReader(str(pdf_file))
+        
+        # Extract metadata
+        metadata = reader.metadata
+        num_pages = len(reader.pages)
+        
+        # Display basic information
+        print(f"\nFile: {pdf_file.name}")
+        print(f"Size: {pdf_file.stat().st_size / 1024:.2f} KB")
+        print(f"Pages: {num_pages}")
+        
+        if metadata:
+            print(f"\nMetadata:")
+            if metadata.title:
+                print(f"  Title: {metadata.title}")
+            if metadata.author:
+                print(f"  Author: {metadata.author}")
+            if metadata.subject:
+                print(f"  Subject: {metadata.subject}")
+            if metadata.creator:
+                print(f"  Creator: {metadata.creator}")
+            if metadata.producer:
+                print(f"  Producer: {metadata.producer}")
+            if metadata.creation_date:
+                print(f"  Creation Date: {metadata.creation_date}")
+        
+        result = {
+            "file": str(pdf_file),
+            "size_kb": pdf_file.stat().st_size / 1024,
+            "pages": num_pages,
+            "metadata": {
+                "title": metadata.title if metadata else None,
+                "author": metadata.author if metadata else None,
+                "subject": metadata.subject if metadata else None,
+            }
+        }
+        
+        # Extract text if requested
+        if show_text:
+            print(f"\n{'='*60}")
+            print("Extracting text...")
+            print(f"{'='*60}")
+            
+            pages_to_extract = num_pages if max_pages is None else min(max_pages, num_pages)
+            text_content = []
+            
+            for page_num in range(pages_to_extract):
+                page = reader.pages[page_num]
+                text = page.extract_text()
+                text_content.append(text)
+                
+                print(f"\n--- Page {page_num + 1} ---")
+                # Show first 500 characters of each page
+                preview = text[:500] + "..." if len(text) > 500 else text
+                print(preview)
+            
+            result["text"] = text_content
+            result["pages_extracted"] = pages_to_extract
+        
+        # Open in system viewer if requested
+        if open_in_viewer:
+            print(f"\nOpening PDF in system viewer...")
+            system = platform.system()
+            try:
+                if system == "Darwin":  # macOS
+                    subprocess.run(["open", str(pdf_file)])
+                elif system == "Windows":
+                    os.startfile(str(pdf_file))
+                else:  # Linux
+                    subprocess.run(["xdg-open", str(pdf_file)])
+                print("PDF opened in viewer")
+            except Exception as e:
+                print(f"Failed to open PDF in viewer: {e}")
+        
+        print(f"\n{'='*60}\n")
+        
+        return result
+
 if __name__ == "__main__":
     simple = Simple()
     #resp = simple.run("tell me a joke") 
@@ -185,3 +289,7 @@ if __name__ == "__main__":
     #     query="What is the main topic of this document?"
     # )
     # print(resp.output_text)
+    
+    # Example: View PDF
+    # simple.view_pdf("simple/data/the-options-income-blueprint.pdf", show_text=True, max_pages=3)
+    # simple.view_pdf("simple/data/the-options-income-blueprint.pdf", open_in_viewer=True)
