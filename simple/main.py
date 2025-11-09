@@ -18,9 +18,9 @@ def main() -> None:
         model=MODEL,
         input="tell me a joke"
     )
-    print(response.output)
+    #print(response.output)
     #print(response)
-    #print(response.output_text)
+    print(response.output_text)
 """
 Response(id='resp_0804ca6536c1056400690fa6d171c48193b8cecb21edda4a3d', created_at=1762633425.0, error=None, 
 incomplete_details=None, instructions=None, metadata={}, model='gpt-4o-mini-2024-07-18', 

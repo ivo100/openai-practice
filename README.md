@@ -1,6 +1,6 @@
 # Hello World
 
-This repository contains a minimal Python hello-world project managed with [Poetry](https://python-poetry.org/).
+This repository contains a minimal Python simple project managed with [Poetry](https://python-poetry.org/).
 
 ## Requirements
 
@@ -17,14 +17,14 @@ poetry install
 
 ## Usage
 
-Execute the hello-world script with:
+Execute the simple script with:
 
 ```bash
-poetry run hello-world
+poetry run simple
 ```
 
 You can also run the module directly:
 
 ```bash
-python -m hello_world.main
+python -m simple.main
 ```
